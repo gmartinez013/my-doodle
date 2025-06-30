@@ -1,0 +1,100 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:function:colorbot-alexa-skill"
+        },
+        "interfaces": [
+          {
+            "type": "ALEXA_PRESENTATION_APL"
+          },
+          {
+            "type": "CONNECTIONS"
+          }
+        ],
+        "regions": {
+          "NA": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:function:colorbot-alexa-skill"
+            }
+          }
+        }
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::devices::all:address:full:read"
+      }
+    ],
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Create custom coloring pages with voice commands",
+          "examplePhrases": [
+            "Alexa, open ColorBot",
+            "Alexa, ask ColorBot to print me a dinosaur to color",
+            "Alexa, tell ColorBot I want a unicorn"
+          ],
+          "keywords": [
+            "coloring",
+            "kids",
+            "children",
+            "art",
+            "creative",
+            "drawing",
+            "print"
+          ],
+          "name": "ColorBot",
+          "description": "ColorBot creates custom coloring pages for kids using voice commands. Just say what you want to color - like a dinosaur, unicorn, or butterfly - and ColorBot will generate a beautiful black-and-white line art image perfect for coloring. The skill can print directly to your connected printer and send the image link to your phone via SMS.\n\nFeatures:\n• Voice-activated custom coloring page generation\n• Direct printing to Alexa-connected printers\n• SMS delivery of image links\n• Bilingual support (English and Spanish)\n• Kid-friendly subjects and designs\n• Safe, appropriate content for children\n\nPerfect for parents, teachers, and caregivers who want to provide engaging creative activities for children.",
+          "smallIconUri": "https://via.placeholder.com/108x108.png?text=CB",
+          "largeIconUri": "https://via.placeholder.com/512x512.png?text=ColorBot"
+        },
+        "es-US": {
+          "summary": "Crea páginas para colorear personalizadas con comandos de voz",
+          "examplePhrases": [
+            "Alexa, abre ColorBot",
+            "Alexa, pide a ColorBot que imprima un dinosaurio para colorear",
+            "Alexa, dile a ColorBot que quiero un unicornio"
+          ],
+          "keywords": [
+            "colorear",
+            "niños",
+            "arte",
+            "creativo",
+            "dibujo",
+            "imprimir"
+          ],
+          "name": "ColorBot",
+          "description": "ColorBot crea páginas para colorear personalizadas para niños usando comandos de voz. Solo di lo que quieres colorear - como un dinosaurio, unicornio o mariposa - y ColorBot generará una hermosa imagen de arte lineal en blanco y negro perfecta para colorear. La skill puede imprimir directamente a tu impresora conectada y enviar el enlace de la imagen a tu teléfono por SMS.\n\nCaracterísticas:\n• Generación de páginas para colorear personalizadas activadas por voz\n• Impresión directa a impresoras conectadas a Alexa\n• Entrega por SMS de enlaces de imágenes\n• Soporte bilingüe (inglés y español)\n• Temas y diseños amigables para niños\n• Contenido seguro y apropiado para niños\n\nPerfecto para padres, maestros y cuidadores que quieren proporcionar actividades creativas atractivas para los niños.",
+          "smallIconUri": "https://via.placeholder.com/108x108.png?text=CB",
+          "largeIconUri": "https://via.placeholder.com/512x512.png?text=ColorBot"
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "To test this skill:\n1. Enable the skill and say 'Alexa, open ColorBot'\n2. Ask for a coloring page like 'print me a dinosaur to color'\n3. The skill will generate an image, attempt to print it, and send an SMS\n4. Test both English and Spanish phrases\n5. Test without a connected printer to verify SMS-only flow",
+      "category": "KIDS",
+      "distributionCountries": [
+        "US"
+      ]
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": true,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://your-website.com/privacy-policy",
+          "termsOfUseUrl": "https://your-website.com/terms-of-use"
+        },
+        "es-US": {
+          "privacyPolicyUrl": "https://your-website.com/privacy-policy-es",
+          "termsOfUseUrl": "https://your-website.com/terms-of-use-es"
+        }
+      }
+    }
+  }
+}

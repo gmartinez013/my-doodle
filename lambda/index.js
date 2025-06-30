@@ -1,0 +1,282 @@
+const AWS = require('aws-sdk');
+const { OpenAI } = require('openai');
+
+// Initialize AWS services
+const s3 = new AWS.S3();
+const sns = new AWS.SNS();
+const ssm = new AWS.SSM();
+
+// Cache for parameters to avoid repeated API calls
+let cachedParams = null;
+
+// Get secure parameters from Parameter Store
+async function getSecureParameters() {
+  if (cachedParams) {
+    return cachedParams;
+  }
+
+  try {
+    const paramNames = [
+      '/colorbot/openai-api-key',
+      '/colorbot/sms-phone-number',
+      '/colorbot/s3-bucket-name'
+    ];
+
+    const result = await ssm.getParameters({
+      Names: paramNames,
+      WithDecryption: true // Decrypt SecureString parameters
+    }).promise();
+
+    const params = {};
+    result.Parameters.forEach(param => {
+      const key = param.Name.split('/').pop(); // Get last part of parameter name
+      params[key] = param.Value;
+    });
+
+    // Cache the parameters for the lifetime of this Lambda execution
+    cachedParams = params;
+    return params;
+  } catch (error) {
+    console.error('Error fetching parameters:', error);
+    throw new Error('Failed to retrieve configuration parameters');
+  }
+}
+
+// Initialize OpenAI (will be set after getting parameters)
+let openai = null;
+
+// Environment variables
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+
+// Localized responses
+const responses = {
+  'en-US': {
+    welcome: "Welcome to ColorBot! You can ask me to create coloring pages. For example, say 'print me a dinosaur to color'.",
+    help: "I can create custom coloring pages for you! Just say something like 'make me a unicorn' or 'I want a dragon coloring page'. I'll generate it, print it if you have a printer connected, and send you the link!",
+    goodbye: "Happy coloring! See you next time!",
+    error: "Sorry, I had trouble creating your coloring page. Please try again.",
+    generating: "Great! I'm creating a {subject} coloring page for you. I'll print it and send the link to your phone!",
+    noPrinter: "I've created your {subject} coloring page and sent the link to your phone. To print directly next time, you can connect a printer in your Alexa app.",
+    printError: "I created your coloring page but couldn't print it. I've sent the link to your phone instead."
+  },
+  'es-US': {
+    welcome: "¡Bienvenido a ColorBot! Puedes pedirme que cree páginas para colorear. Por ejemplo, di 'imprímeme un dinosaurio para colorear'.",
+    help: "¡Puedo crear páginas para colorear personalizadas! Solo di algo como 'hazme un unicornio' o 'quiero una página de dragón para colorear'. ¡La generaré, la imprimiré si tienes una impresora conectada y te enviaré el enlace!",
+    goodbye: "¡Feliz coloreado! ¡Hasta la próxima!",
+    error: "Lo siento, tuve problemas para crear tu página para colorear. Por favor, inténtalo de nuevo.",
+    generating: "¡Genial! Estoy creando una página para colorear de {subject}. ¡La imprimiré y enviaré el enlace a tu teléfono!",
+    noPrinter: "He creado tu página para colorear de {subject} y he enviado el enlace a tu teléfono. Para imprimir directamente la próxima vez, puedes conectar una impresora en tu aplicación Alexa.",
+    printError: "Creé tu página para colorear pero no pude imprimirla. He enviado el enlace a tu teléfono en su lugar."
+  }
+};
+
+// Subject translations for Spanish prompts
+const subjectTranslations = {
+  'dinosaurio': 'dinosaur',
+  'unicornio': 'unicorn', 
+  'mariposa': 'butterfly',
+  'dragón': 'dragon',
+  'gato': 'cat',
+  'perro': 'dog',
+  'pájaro': 'bird',
+  'flor': 'flower',
+  'árbol': 'tree',
+  'casa': 'house'
+};
+
+exports.handler = async (event) => {
+  console.log('Request:', JSON.stringify(event, null, 2));
+
+  const request = event.request;
+  const locale = event.request.locale || 'en-US';
+  const language = responses[locale] || responses['en-US'];
+
+  try {
+    // Initialize OpenAI with secure parameters if not already done
+    if (!openai) {
+      const params = await getSecureParameters();
+      openai = new OpenAI({
+        apiKey: params['openai-api-key'],
+      });
+    }
+
+    if (request.type === 'LaunchRequest') {
+      return buildResponse(language.welcome, false, locale);
+    }
+
+    if (request.type === 'IntentRequest') {
+      const intentName = request.intent.name;
+
+      switch (intentName) {
+        case 'GenerateColoringPageIntent':
+          return await handleGenerateColoringPage(request, locale);
+        
+        case 'AMAZON.HelpIntent':
+          return buildResponse(language.help, false, locale);
+        
+        case 'AMAZON.StopIntent':
+        case 'AMAZON.CancelIntent':
+          return buildResponse(language.goodbye, true, locale);
+        
+        default:
+          return buildResponse(language.error, true, locale);
+      }
+    }
+
+    return buildResponse(language.error, true, locale);
+  } catch (error) {
+    console.error('Handler error:', error);
+    return buildResponse(language.error, true, locale);
+  }
+};
+
+async function handleGenerateColoringPage(request, locale) {
+  const language = responses[locale];
+  
+  try {
+    // Get secure parameters
+    const params = await getSecureParameters();
+    
+    // Extract subject from slot
+    let subject = request.intent.slots?.subject?.value || 'coloring page';
+    
+    // Translate Spanish subjects to English for OpenAI API
+    const englishSubject = subjectTranslations[subject.toLowerCase()] || subject;
+    
+    // Generate image using OpenAI
+    const imageUrl = await generateColoringPageImage(englishSubject);
+    
+    // Upload to S3
+    const s3Url = await uploadImageToS3(imageUrl, englishSubject, params['s3-bucket-name']);
+    
+    // Send SMS
+    await sendSMS(s3Url, subject, locale, params['sms-phone-number']);
+    
+    // Build response with print directive
+    const speechText = language.generating.replace('{subject}', subject);
+    
+    return buildResponseWithPrintDirective(speechText, s3Url, subject, locale);
+    
+  } catch (error) {
+    console.error('Error generating coloring page:', error);
+    return buildResponse(language.error, true, locale);
+  }
+}
+
+async function generateColoringPageImage(subject) {
+  const prompt = `Create a simple, black and white line art drawing of a ${subject} suitable for children to color. The image should be:
+- Simple line art with clear, bold outlines
+- Black lines on white background only
+- No shading, gradients, or filled areas
+- Child-friendly and cartoon-style
+- Large, simple shapes that are easy to color
+- No text or words in the image`;
+
+  try {
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "standard",
+      style: "natural"
+    });
+
+    return response.data[0].url;
+  } catch (error) {
+    console.error('OpenAI API Error:', error);
+    throw new Error('Failed to generate image');
+  }
+}
+
+async function uploadImageToS3(imageUrl, subject, bucketName) {
+  try {
+    // Download image from OpenAI
+    const response = await fetch(imageUrl);
+    const imageBuffer = await response.buffer();
+    
+    // Generate unique filename
+    const timestamp = Date.now();
+    const filename = `coloring-pages/${subject}-${timestamp}.png`;
+    
+    // Upload to S3
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: filename,
+      Body: imageBuffer,
+      ContentType: 'image/png',
+      ACL: 'public-read'
+    };
+    
+    const result = await s3.upload(uploadParams).promise();
+    return result.Location;
+    
+  } catch (error) {
+    console.error('S3 Upload Error:', error);
+    throw new Error('Failed to upload image');
+  }
+}
+
+async function sendSMS(imageUrl, subject, locale, phoneNumber) {
+  const language = responses[locale];
+  const message = locale === 'es-US' 
+    ? `¡Tu página para colorear de ${subject} está lista! Descárgala aquí: ${imageUrl}`
+    : `Your ${subject} coloring page is ready! Download it here: ${imageUrl}`;
+  
+  try {
+    const params = {
+      Message: message,
+      PhoneNumber: phoneNumber,
+      MessageAttributes: {
+        'AWS.SNS.SMS.SMSType': {
+          DataType: 'String',
+          StringValue: 'Transactional'
+        }
+      }
+    };
+    
+    await sns.publish(params).promise();
+    console.log('SMS sent successfully');
+    
+  } catch (error) {
+    console.error('SMS Error:', error);
+    // Don't throw error - SMS failure shouldn't break the main flow
+  }
+}
+
+function buildResponse(speechText, shouldEndSession, locale, directives = []) {
+  return {
+    version: '1.0',
+    response: {
+      outputSpeech: {
+        type: 'PlainText',
+        text: speechText
+      },
+      directives: directives,
+      shouldEndSession: shouldEndSession
+    },
+    sessionAttributes: {
+      locale: locale
+    }
+  };
+}
+
+function buildResponseWithPrintDirective(speechText, imageUrl, subject, locale) {
+  const printDirective = {
+    type: 'Connections.StartConnection',
+    uri: 'connection://AMAZON.PrintImage/1',
+    input: {
+      '@type': 'PrintImageRequest',
+      '@version': '1',
+      title: locale === 'es-US' ? `Página para colorear de ${subject}` : `${subject} Coloring Page`,
+      description: locale === 'es-US' 
+        ? `Una página para colorear personalizada de ${subject}`
+        : `A custom ${subject} coloring page`,
+      imageUrl: imageUrl,
+      imageType: 'PNG'
+    },
+    token: `print-${Date.now()}`
+  };
+
+  return buildResponse(speechText, false, locale, [printDirective]);
+}

@@ -1,0 +1,13 @@
+{
+  "name": "colorbot-lambda",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for ColorBot Alexa skill",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "openai": "^4.67.1"
+  },
+  "scripts": {
+    "deploy": "zip -r colorbot-lambda.zip . && aws lambda update-function-code --function-name colorbot-alexa-skill --zip-file fileb://colorbot-lambda.zip"
+  }
+}

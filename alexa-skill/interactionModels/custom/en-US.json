@@ -1,0 +1,180 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "colorbot",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "GenerateColoringPageIntent",
+          "slots": [
+            {
+              "name": "subject",
+              "type": "COLORING_SUBJECTS",
+              "samples": [
+                "a {subject}",
+                "{subject}"
+              ]
+            }
+          ],
+          "samples": [
+            "print me a {subject} to color",
+            "print me a {subject}",
+            "I want a {subject} coloring page",
+            "I want a {subject}",
+            "make me a {subject}",
+            "create a {subject} for coloring",
+            "create a {subject}",
+            "give me a {subject}",
+            "draw me a {subject}",
+            "generate a {subject}",
+            "can you make a {subject}",
+            "I need a {subject}",
+            "show me a {subject}"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "COLORING_SUBJECTS",
+          "values": [
+            {
+              "name": {
+                "value": "dinosaur"
+              }
+            },
+            {
+              "name": {
+                "value": "unicorn"
+              }
+            },
+            {
+              "name": {
+                "value": "dragon"
+              }
+            },
+            {
+              "name": {
+                "value": "butterfly"
+              }
+            },
+            {
+              "name": {
+                "value": "cat"
+              }
+            },
+            {
+              "name": {
+                "value": "dog"
+              }
+            },
+            {
+              "name": {
+                "value": "bird"
+              }
+            },
+            {
+              "name": {
+                "value": "flower"
+              }
+            },
+            {
+              "name": {
+                "value": "tree"
+              }
+            },
+            {
+              "name": {
+                "value": "house"
+              }
+            },
+            {
+              "name": {
+                "value": "car"
+              }
+            },
+            {
+              "name": {
+                "value": "airplane"
+              }
+            },
+            {
+              "name": {
+                "value": "boat"
+              }
+            },
+            {
+              "name": {
+                "value": "castle"
+              }
+            },
+            {
+              "name": {
+                "value": "princess"
+              }
+            },
+            {
+              "name": {
+                "value": "prince"
+              }
+            },
+            {
+              "name": {
+                "value": "superhero"
+              }
+            },
+            {
+              "name": {
+                "value": "robot"
+              }
+            },
+            {
+              "name": {
+                "value": "monster"
+              }
+            },
+            {
+              "name": {
+                "value": "alien"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "GenerateColoringPageIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "subject",
+              "type": "COLORING_SUBJECTS",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {}
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": []
+  }
+}
