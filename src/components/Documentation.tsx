@@ -93,19 +93,19 @@ const Documentation = () => {
                       AWS SNS Messaging
                     </li>
                     <li className="flex items-center">
-                    AWS Lambda (runs in AWS cloud)
+                      <CheckCircle className="w-4 h-4 mr-2" />
                       OpenAI API Integration
                     </li>
                   </ul>
-                    Amazon S3 (cloud storage)
+                </div>
               </div>
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                    AWS SNS (cloud messaging)
+                <h4 className="font-semibold text-yellow-800 mb-2">Prerequisites</h4>
                 <ul className="text-yellow-700 space-y-1">
                   <li>• AWS Account with appropriate permissions</li>
                   <li>• Amazon Developer Account for Alexa Skills</li>
-                    Parameter Store (encrypted secrets)
+                  <li>• OpenAI API key</li>
                   <li>• Phone number for SMS testing</li>
                 </ul>
               </div>
