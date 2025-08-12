@@ -57,7 +57,7 @@ export SMS_PHONE_NUMBER="+1234567890"
 ## Architecture
 
 ```
-Voice Request → Alexa → Lambda → OpenAI API → Generated Image
+Voice Request → Alexa → AWS Lambda (Cloud) → OpenAI API → Generated Image
                   ↓              ↓
                Print Job        S3 Storage
                   ↓              ↓

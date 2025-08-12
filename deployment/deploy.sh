@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# ColorBot Alexa Skill Deployment Script
+# ColorBot Alexa Skill - Deploy to AWS Cloud
+# This script creates resources in YOUR AWS account, not locally
 
-echo "🎨 Deploying ColorBot Alexa Skill..."
+echo "🎨 Deploying ColorBot Alexa Skill to AWS Cloud..."
+echo "📍 This creates resources in YOUR AWS account"
+echo "🚀 The Lambda function will run in AWS, not on your machine"
+echo ""
 
 # Check if required environment variables are set
 if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$OPENAI_API_KEY" ] || [ -z "$S3_BUCKET_NAME" ] || [ -z "$SMS_PHONE_NUMBER" ]; then
