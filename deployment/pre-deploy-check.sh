@@ -14,11 +14,14 @@ NC='\033[0m' # No Color
 check_aws_cli() {
     echo -n "Checking AWS CLI... "
     if command -v aws &> /dev/null; then
-        echo -e "${GREEN}✓ Installed${NC}"
+        AWS_VERSION=$(aws --version 2>&1 | cut -d/ -f2 | cut -d' ' -f1)
+        echo -e "${GREEN}✓ Installed (v$AWS_VERSION)${NC}"
         return 0
     else
         echo -e "${RED}✗ Not found${NC}"
-        echo "Install AWS CLI: https://aws.amazon.com/cli/"
+        echo "  Install: https://aws.amazon.com/cli/"
+        echo "  macOS: brew install awscli"
+        echo "  Linux: curl + install script"
         return 1
     fi
 }
@@ -108,10 +111,41 @@ check_s3_bucket_availability() {
     fi
 }
 
+check_required_tools() {
+    echo "Checking required tools..."
+    local all_tools=true
+    
+    # Check curl
+    if command -v curl &> /dev/null; then
+        echo -e "  ${GREEN}✓ curl installed${NC}"
+    else
+        echo -e "  ${RED}✗ curl not found${NC}"
+        all_tools=false
+    fi
+    
+    # Check zip
+    if command -v zip &> /dev/null; then
+        echo -e "  ${GREEN}✓ zip installed${NC}"
+    else
+        echo -e "  ${RED}✗ zip not found${NC}"
+        all_tools=false
+    fi
+    
+    # Check bash
+    if [ -n "$BASH_VERSION" ]; then
+        echo -e "  ${GREEN}✓ bash available${NC}"
+    else
+        echo -e "  ${YELLOW}⚠ Not running in bash${NC}"
+    fi
+    
+    return $all_tools
+}
+
 # Run all checks
 echo ""
 all_good=true
 
+check_required_tools || all_good=false
 check_aws_cli || all_good=false
 check_aws_credentials || all_good=false
 check_environment_vars || all_good=false

@@ -1,5 +1,43 @@
 # ColorBot Deployment Checklist ✅
 
+## 🛠️ **Required Dependencies**
+
+### Essential Tools (Required)
+- **AWS CLI**: For deploying to AWS
+- **curl**: For validating OpenAI API key (usually pre-installed)
+- **zip**: For packaging Lambda function (usually pre-installed)
+- **bash**: For running deployment scripts (usually pre-installed)
+
+### Install AWS CLI
+**macOS:**
+```bash
+# Using Homebrew
+brew install awscli
+
+# Or download installer
+curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+sudo installer -pkg AWSCLIV2.pkg -target /
+```
+
+**Linux:**
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+**Windows:**
+```bash
+# Download and run: https://awscli.amazonaws.com/AWSCLIV2.msi
+```
+
+### Verify Installation
+```bash
+aws --version  # Should show AWS CLI version
+curl --version # Should show curl version
+zip --version  # Should show zip version
+```
+
 ## 🔧 Pre-Deployment Requirements
 
 ### 1. AWS CLI Setup
