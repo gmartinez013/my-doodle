@@ -71,7 +71,6 @@ aws lambda create-function \
   --zip-file fileb://colorbot-lambda.zip \
   --timeout 30 \
   --memory-size 256 \
-  --environment Variables="{AWS_REGION=us-east-1}"
 
 # Step 8: Add Alexa trigger
 echo "🗣️ Adding Alexa trigger to Lambda..."
