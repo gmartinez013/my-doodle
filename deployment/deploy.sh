@@ -71,6 +71,7 @@ aws lambda create-function \
   --zip-file fileb://colorbot-lambda.zip \
   --timeout 30 \
   --memory-size 256 \
+  --region us-east-1
 
 # Step 8: Add Alexa trigger
 echo "🗣️ Adding Alexa trigger to Lambda..."
@@ -78,7 +79,8 @@ aws lambda add-permission \
   --function-name colorbot-alexa-skill \
   --statement-id alexa-skill-trigger \
   --action lambda:InvokeFunction \
-  --principal alexa-appkit.amazon.com
+  --principal alexa-appkit.amazon.com \
+  --region us-east-1
 
 echo "✅ Deployment complete!"
 echo "📋 Next steps:"
