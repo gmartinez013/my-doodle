@@ -24,6 +24,10 @@ chmod +x setup-parameters.sh
 echo "📦 Creating S3 bucket: $S3_BUCKET_NAME"
 aws s3 mb s3://$S3_BUCKET_NAME --region us-east-1
 
+# Step 2.1: Disable block public access to allow public read policy
+echo "🔓 Configuring S3 bucket for public read access..."
+aws s3api put-public-access-block --bucket $S3_BUCKET_NAME --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+
 # Step 3: Apply bucket policy
 echo "🔐 Applying S3 bucket policy..."
 sed "s/your-coloring-bucket/$S3_BUCKET_NAME/g" ../aws-setup/s3-bucket-policy.json > temp-bucket-policy.json
