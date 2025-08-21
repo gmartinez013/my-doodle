@@ -46,21 +46,21 @@ check_environment_vars() {
     
     if [ -z "$OPENAI_API_KEY" ]; then
         echo -e "  ${RED}✗ OPENAI_API_KEY not set${NC}"
-        all_set=false
+        all_set=1
     else
         echo -e "  ${GREEN}✓ OPENAI_API_KEY set${NC} (${OPENAI_API_KEY:0:10}...)"
     fi
     
     if [ -z "$SMS_PHONE_NUMBER" ]; then
         echo -e "  ${RED}✗ SMS_PHONE_NUMBER not set${NC}"
-        all_set=false
+        all_set=1
     else
         echo -e "  ${GREEN}✓ SMS_PHONE_NUMBER set${NC} ($SMS_PHONE_NUMBER)"
     fi
     
     if [ -z "$S3_BUCKET_NAME" ]; then
         echo -e "  ${RED}✗ S3_BUCKET_NAME not set${NC}"
-        all_set=false
+        all_set=1
     else
         echo -e "  ${GREEN}✓ S3_BUCKET_NAME set${NC} ($S3_BUCKET_NAME)"
     fi
@@ -75,7 +75,7 @@ check_environment_vars() {
         echo -e "  ${GREEN}✓ AWS_ACCOUNT_ID set${NC} ($AWS_ACCOUNT_ID)"
     fi
     
-    return $all_set
+    [ "$all_set" = true ]
 }
 
 check_openai_key() {
@@ -113,14 +113,14 @@ check_s3_bucket_availability() {
 
 check_required_tools() {
     echo "Checking required tools..."
-    local all_tools=true
+    local all_tools=0
     
     # Check curl
     if command -v curl &> /dev/null; then
         echo -e "  ${GREEN}✓ curl installed${NC}"
     else
         echo -e "  ${RED}✗ curl not found${NC}"
-        all_tools=false
+        all_tools=1
     fi
     
     # Check zip
@@ -128,7 +128,7 @@ check_required_tools() {
         echo -e "  ${GREEN}✓ zip installed${NC}"
     else
         echo -e "  ${RED}✗ zip not found${NC}"
-        all_tools=false
+        all_tools=1
     fi
     
     # Check bash
@@ -143,19 +143,19 @@ check_required_tools() {
 
 # Run all checks
 echo ""
-all_good=true
+all_good=0
 
-check_required_tools || all_good=false
-check_aws_cli || all_good=false
-check_aws_credentials || all_good=false
-check_environment_vars || all_good=false
-check_openai_key || all_good=false
-check_s3_bucket_availability || all_good=false
+check_required_tools || all_good=1
+check_aws_cli || all_good=1
+check_aws_credentials || all_good=1
+check_environment_vars || all_good=1
+check_openai_key || all_good=1
+check_s3_bucket_availability || all_good=1
 
 echo ""
 echo "================================"
 
-if [ "$all_good" = true ]; then
+if [ "$all_good" = "0" ]; then
     echo -e "${GREEN}🎉 All checks passed! Ready to deploy.${NC}"
     echo ""
     echo "Run deployment:"
