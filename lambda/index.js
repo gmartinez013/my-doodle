@@ -81,7 +81,17 @@ const subjectTranslations = {
   'pájaro': 'bird',
   'flor': 'flower',
   'árbol': 'tree',
-  'casa': 'house'
+  'casa': 'house',
+  'carro': 'car',
+  'avión': 'airplane',
+  'barco': 'boat',
+  'castillo': 'castle',
+  'princesa': 'princess',
+  'príncipe': 'prince',
+  'superhéroe': 'superhero',
+  'robot': 'robot',
+  'monstruo': 'monster',
+  'extraterrestre': 'alien'
 };
 
 exports.handler = async (event) => {
@@ -138,7 +148,16 @@ async function handleGenerateColoringPage(request, locale) {
     const params = await getSecureParameters();
     
     // Extract subject from slot
-    let subject = request.intent.slots?.subject?.value || 'coloring page';
+    const subjectSlot = request.intent.slots?.subject;
+    let subject = subjectSlot?.value;
+    
+    // Validate that subject was provided
+    if (!subject || subject.trim() === '') {
+      const errorMsg = locale === 'es-US' 
+        ? "No entendí qué quieres colorear. Por favor, di algo como 'imprímeme un dinosaurio para colorear'."
+        : "I didn't understand what you'd like to color. Please say something like 'print me a dinosaur to color'.";
+      return buildResponse(errorMsg, false, locale);
+    }
     
     // Translate Spanish subjects to English for OpenAI API
     const englishSubject = subjectTranslations[subject.toLowerCase()] || subject;
@@ -193,19 +212,26 @@ async function uploadImageToS3(imageUrl, subject, bucketName) {
   try {
     // Download image from OpenAI
     const response = await fetch(imageUrl);
-    const imageBuffer = await response.buffer();
+    if (!response.ok) {
+      throw new Error(`Failed to download image: ${response.status} ${response.statusText}`);
+    }
     
-    // Generate unique filename
+    // Convert response to Buffer for S3 upload
+    const arrayBuffer = await response.arrayBuffer();
+    const imageBuffer = Buffer.from(arrayBuffer);
+    
+    // Generate unique filename (sanitize subject to remove spaces and special chars)
     const timestamp = Date.now();
-    const filename = `coloring-pages/${subject}-${timestamp}.png`;
+    const sanitizedSubject = subject.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const filename = `coloring-pages/${sanitizedSubject}-${timestamp}.png`;
     
     // Upload to S3
+    // Note: ACLs are disabled on this bucket, public access is handled via bucket policy
     const uploadParams = {
       Bucket: bucketName,
       Key: filename,
       Body: imageBuffer,
-      ContentType: 'image/png',
-      ACL: 'public-read'
+      ContentType: 'image/png'
     };
     
     const result = await s3.upload(uploadParams).promise();

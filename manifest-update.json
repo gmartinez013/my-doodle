@@ -1,0 +1,17 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:707843606345:function:colorbot-alexa-skill"
+        },
+        "interfaces": [
+          {
+            "type": "CONNECTIONS"
+          }
+        ]
+      }
+    }
+  }
+}
+

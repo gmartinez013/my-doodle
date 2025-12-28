@@ -24,11 +24,7 @@
           "slots": [
             {
               "name": "subject",
-              "type": "COLORING_SUBJECTS",
-              "samples": [
-                "a {subject}",
-                "{subject}"
-              ]
+              "type": "COLORING_SUBJECTS"
             }
           ],
           "samples": [
@@ -155,26 +151,6 @@
           ]
         }
       ]
-    },
-    "dialog": {
-      "intents": [
-        {
-          "name": "GenerateColoringPageIntent",
-          "confirmationRequired": false,
-          "prompts": {},
-          "slots": [
-            {
-              "name": "subject",
-              "type": "COLORING_SUBJECTS",
-              "confirmationRequired": false,
-              "elicitationRequired": false,
-              "prompts": {}
-            }
-          ]
-        }
-      ],
-      "delegationStrategy": "ALWAYS"
-    },
-    "prompts": []
+    }
   }
 }

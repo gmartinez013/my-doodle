@@ -58,29 +58,63 @@ rm temp-iam-policy.json
 # Step 6: Package Lambda function
 echo "📦 Packaging Lambda function..."
 cd ../lambda
-zip -r ../deployment/colorbot-lambda.zip .
+# Install dependencies
+echo "📥 Installing npm dependencies..."
+npm install --production
+# Create deployment package
+echo "📦 Creating deployment package..."
+zip -r ../deployment/colorbot-lambda.zip . -x "*.git*" "node_modules/.cache/*"
 cd ../deployment
 
-# Step 7: Create Lambda function (no environment variables needed - using Parameter Store)
-echo "⚡ Creating Lambda function..."
-aws lambda create-function \
-  --function-name colorbot-alexa-skill \
-  --runtime nodejs18.x \
-  --role arn:aws:iam::$AWS_ACCOUNT_ID:role/ColorBotLambdaRole \
-  --handler index.handler \
-  --zip-file fileb://colorbot-lambda.zip \
-  --timeout 30 \
-  --memory-size 256 \
-  --region us-east-1
+# Step 7: Create or update Lambda function (no environment variables needed - using Parameter Store)
+echo "⚡ Deploying Lambda function..."
+# Check if function exists
+if aws lambda get-function --function-name colorbot-alexa-skill --region us-east-1 &>/dev/null; then
+    echo "📝 Updating existing Lambda function code..."
+    aws lambda update-function-code \
+      --function-name colorbot-alexa-skill \
+      --zip-file fileb://colorbot-lambda.zip \
+      --region us-east-1 \
+      --output json > /dev/null
+    echo "✅ Lambda function code updated"
+    
+    echo "⚙️ Updating Lambda function configuration..."
+    aws lambda update-function-configuration \
+      --function-name colorbot-alexa-skill \
+      --timeout 30 \
+      --memory-size 256 \
+      --region us-east-1 \
+      --output json > /dev/null
+    echo "✅ Lambda function configuration updated"
+else
+    echo "🆕 Creating new Lambda function..."
+    aws lambda create-function \
+      --function-name colorbot-alexa-skill \
+      --runtime nodejs18.x \
+      --role arn:aws:iam::$AWS_ACCOUNT_ID:role/ColorBotLambdaRole \
+      --handler index.handler \
+      --zip-file fileb://colorbot-lambda.zip \
+      --timeout 30 \
+      --memory-size 256 \
+      --region us-east-1 \
+      --output json > /dev/null
+    echo "✅ Lambda function created"
+fi
 
 # Step 8: Add Alexa trigger
 echo "🗣️ Adding Alexa trigger to Lambda..."
-aws lambda add-permission \
-  --function-name colorbot-alexa-skill \
-  --statement-id alexa-skill-trigger \
-  --action lambda:InvokeFunction \
-  --principal alexa-appkit.amazon.com \
-  --region us-east-1
+if aws lambda get-policy --function-name colorbot-alexa-skill --region us-east-1 2>/dev/null | grep -q "alexa-skill-trigger"; then
+    echo "✅ Alexa trigger permission already exists"
+else
+    aws lambda add-permission \
+      --function-name colorbot-alexa-skill \
+      --statement-id alexa-skill-trigger \
+      --action lambda:InvokeFunction \
+      --principal alexa-appkit.amazon.com \
+      --region us-east-1 \
+      --output json > /dev/null
+    echo "✅ Alexa trigger permission added"
+fi
 
 echo "✅ Deployment complete!"
 echo "📋 Next steps:"
