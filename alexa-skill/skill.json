@@ -15,14 +15,6 @@
       }
     },
     "manifestVersion": "1.0",
-    "permissions": [
-      {
-        "name": "alexa::devices::all:address:full:read"
-      },
-      {
-        "name": "alexa::devices::all:printers:write"
-      }
-    ],
     "publishingInformation": {
       "locales": {
         "en-US": {

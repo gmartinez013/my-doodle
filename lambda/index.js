@@ -171,10 +171,10 @@ async function handleGenerateColoringPage(request, locale) {
     // Send Email
     await sendEmail(s3Url, subject, locale, params['notification-email']);
     
-    // Build response with print directive
-    const speechText = language.generating.replace('{subject}', subject);
-    
-    return buildResponseWithPrintDirective(speechText, s3Url, subject, locale);
+    // Build response (without print directive for simulator compatibility)
+    const speechText = language.noPrinter.replace('{subject}', subject);
+
+    return buildResponse(speechText, true, locale);
     
   } catch (error) {
     console.error('Error generating coloring page:', error);
