@@ -6,13 +6,13 @@
 echo "🔐 Setting up secure parameters for ColorBot..."
 
 # Check if required values are provided
-if [ -z "$OPENAI_API_KEY" ] || [ -z "$SMS_PHONE_NUMBER" ] || [ -z "$S3_BUCKET_NAME" ]; then
+if [ -z "$OPENAI_API_KEY" ] || [ -z "$NOTIFICATION_EMAIL" ] || [ -z "$S3_BUCKET_NAME" ]; then
     echo "❌ Error: Required environment variables are missing."
-    echo "Please set: OPENAI_API_KEY, SMS_PHONE_NUMBER, S3_BUCKET_NAME"
+    echo "Please set: OPENAI_API_KEY, NOTIFICATION_EMAIL, S3_BUCKET_NAME"
     echo ""
     echo "Example:"
     echo "export OPENAI_API_KEY='sk-your-key-here'"
-    echo "export SMS_PHONE_NUMBER='+1234567890'"
+    echo "export NOTIFICATION_EMAIL='your-email@example.com'"
     echo "export S3_BUCKET_NAME='my-coloring-bucket'"
     echo "Then run this script again."
     exit 1
@@ -27,13 +27,13 @@ aws ssm put-parameter \
   --description "OpenAI API key for ColorBot image generation" \
   --overwrite
 
-# Store SMS Phone Number as SecureString (encrypted)
-echo "📱 Storing SMS Phone Number (encrypted)..."
+# Store Notification Email as SecureString (encrypted)
+echo "📧 Storing Notification Email (encrypted)..."
 aws ssm put-parameter \
-  --name "/colorbot/sms-phone-number" \
-  --value "$SMS_PHONE_NUMBER" \
+  --name "/colorbot/notification-email" \
+  --value "$NOTIFICATION_EMAIL" \
   --type "SecureString" \
-  --description "Phone number for ColorBot SMS notifications" \
+  --description "Email address for ColorBot notifications" \
   --overwrite
 
 # Store S3 Bucket Name as String (not sensitive)
@@ -49,8 +49,8 @@ echo "✅ All parameters stored securely!"
 echo ""
 echo "📋 Parameters created:"
 echo "  • /colorbot/openai-api-key (SecureString - encrypted)"
-echo "  • /colorbot/sms-phone-number (SecureString - encrypted)"
+echo "  • /colorbot/notification-email (SecureString - encrypted)"
 echo "  • /colorbot/s3-bucket-name (String)"
 echo ""
 echo "🔍 To verify parameters were created:"
-echo "aws ssm get-parameters --names '/colorbot/openai-api-key' '/colorbot/sms-phone-number' '/colorbot/s3-bucket-name' --with-decryption"
+echo "aws ssm get-parameters --names '/colorbot/openai-api-key' '/colorbot/notification-email' '/colorbot/s3-bucket-name' --with-decryption"

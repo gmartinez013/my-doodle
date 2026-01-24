@@ -51,11 +51,11 @@ check_environment_vars() {
         echo -e "  ${GREEN}✓ OPENAI_API_KEY set${NC} (${OPENAI_API_KEY:0:10}...)"
     fi
     
-    if [ -z "$SMS_PHONE_NUMBER" ]; then
-        echo -e "  ${RED}✗ SMS_PHONE_NUMBER not set${NC}"
+    if [ -z "$NOTIFICATION_EMAIL" ]; then
+        echo -e "  ${RED}✗ NOTIFICATION_EMAIL not set${NC}"
         all_set=1
     else
-        echo -e "  ${GREEN}✓ SMS_PHONE_NUMBER set${NC} ($SMS_PHONE_NUMBER)"
+        echo -e "  ${GREEN}✓ NOTIFICATION_EMAIL set${NC} ($NOTIFICATION_EMAIL)"
     fi
     
     if [ -z "$S3_BUCKET_NAME" ]; then
@@ -166,7 +166,7 @@ else
     echo ""
     echo "Quick setup commands:"
     echo "  export OPENAI_API_KEY=\"sk-your-key-here\""
-    echo "  export SMS_PHONE_NUMBER=\"+1234567890\""
+    echo "  export NOTIFICATION_EMAIL=\"your-email@example.com\""
     echo "  export S3_BUCKET_NAME=\"colorbot-\$(whoami)-\$(date +%s)\""
     echo "  export AWS_ACCOUNT_ID=\"\$(aws sts get-caller-identity --query Account --output text)\""
     exit 1

@@ -9,9 +9,9 @@ echo "🚀 The Lambda function will run in AWS, not on your machine"
 echo ""
 
 # Check if required environment variables are set
-if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$OPENAI_API_KEY" ] || [ -z "$S3_BUCKET_NAME" ] || [ -z "$SMS_PHONE_NUMBER" ]; then
+if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$OPENAI_API_KEY" ] || [ -z "$S3_BUCKET_NAME" ] || [ -z "$NOTIFICATION_EMAIL" ]; then
     echo "❌ Error: Required environment variables are missing."
-    echo "Please set: AWS_ACCOUNT_ID, OPENAI_API_KEY, S3_BUCKET_NAME, SMS_PHONE_NUMBER"
+    echo "Please set: AWS_ACCOUNT_ID, OPENAI_API_KEY, S3_BUCKET_NAME, NOTIFICATION_EMAIL"
     exit 1
 fi
 

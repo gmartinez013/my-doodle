@@ -22,7 +22,8 @@
     {
       "Effect": "Allow",
       "Action": [
-        "sns:Publish"
+        "ses:SendEmail",
+        "ses:SendRawEmail"
       ],
       "Resource": "*"
     },
@@ -34,7 +35,7 @@
       ],
       "Resource": [
         "arn:aws:ssm:*:*:parameter/colorbot/openai-api-key",
-        "arn:aws:ssm:*:*:parameter/colorbot/sms-phone-number",
+        "arn:aws:ssm:*:*:parameter/colorbot/notification-email",
         "arn:aws:ssm:*:*:parameter/colorbot/s3-bucket-name"
       ]
     }

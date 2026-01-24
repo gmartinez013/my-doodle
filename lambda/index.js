@@ -3,7 +3,7 @@ const { OpenAI } = require('openai');
 
 // Initialize AWS services
 const s3 = new AWS.S3();
-const sns = new AWS.SNS();
+const ses = new AWS.SES();
 const ssm = new AWS.SSM();
 
 // Cache for parameters to avoid repeated API calls
@@ -18,7 +18,7 @@ async function getSecureParameters() {
   try {
     const paramNames = [
       '/colorbot/openai-api-key',
-      '/colorbot/sms-phone-number',
+      '/colorbot/notification-email',
       '/colorbot/s3-bucket-name'
     ];
 
@@ -55,18 +55,18 @@ const responses = {
     help: "I can create custom coloring pages for you! Just say something like 'make me a unicorn' or 'I want a dragon coloring page'. I'll generate it, print it if you have a printer connected, and send you the link!",
     goodbye: "Happy coloring! See you next time!",
     error: "Sorry, I had trouble creating your coloring page. Please try again.",
-    generating: "Great! I'm creating a {subject} coloring page for you. I'll print it and send the link to your phone!",
-    noPrinter: "I've created your {subject} coloring page and sent the link to your phone. To print directly next time, you can connect a printer in your Alexa app.",
-    printError: "I created your coloring page but couldn't print it. I've sent the link to your phone instead."
+    generating: "Great! I'm creating a {subject} coloring page for you. I'll print it and send the link to your email!",
+    noPrinter: "I've created your {subject} coloring page and sent the link to your email. To print directly next time, you can connect a printer in your Alexa app.",
+    printError: "I created your coloring page but couldn't print it. I've sent the link to your email instead."
   },
   'es-US': {
     welcome: "¡Bienvenido a ColorBot! Puedes pedirme que cree páginas para colorear. Por ejemplo, di 'imprímeme un dinosaurio para colorear'.",
     help: "¡Puedo crear páginas para colorear personalizadas! Solo di algo como 'hazme un unicornio' o 'quiero una página de dragón para colorear'. ¡La generaré, la imprimiré si tienes una impresora conectada y te enviaré el enlace!",
     goodbye: "¡Feliz coloreado! ¡Hasta la próxima!",
     error: "Lo siento, tuve problemas para crear tu página para colorear. Por favor, inténtalo de nuevo.",
-    generating: "¡Genial! Estoy creando una página para colorear de {subject}. ¡La imprimiré y enviaré el enlace a tu teléfono!",
-    noPrinter: "He creado tu página para colorear de {subject} y he enviado el enlace a tu teléfono. Para imprimir directamente la próxima vez, puedes conectar una impresora en tu aplicación Alexa.",
-    printError: "Creé tu página para colorear pero no pude imprimirla. He enviado el enlace a tu teléfono en su lugar."
+    generating: "¡Genial! Estoy creando una página para colorear de {subject}. ¡La imprimiré y enviaré el enlace a tu correo!",
+    noPrinter: "He creado tu página para colorear de {subject} y he enviado el enlace a tu correo. Para imprimir directamente la próxima vez, puedes conectar una impresora en tu aplicación Alexa.",
+    printError: "Creé tu página para colorear pero no pude imprimirla. He enviado el enlace a tu correo en su lugar."
   }
 };
 
@@ -168,8 +168,8 @@ async function handleGenerateColoringPage(request, locale) {
     // Upload to S3
     const s3Url = await uploadImageToS3(imageUrl, englishSubject, params['s3-bucket-name']);
     
-    // Send SMS
-    await sendSMS(s3Url, subject, locale, params['sms-phone-number']);
+    // Send Email
+    await sendEmail(s3Url, subject, locale, params['notification-email']);
     
     // Build response with print directive
     const speechText = language.generating.replace('{subject}', subject);
@@ -243,30 +243,51 @@ async function uploadImageToS3(imageUrl, subject, bucketName) {
   }
 }
 
-async function sendSMS(imageUrl, subject, locale, phoneNumber) {
-  const language = responses[locale];
-  const message = locale === 'es-US' 
-    ? `¡Tu página para colorear de ${subject} está lista! Descárgala aquí: ${imageUrl}`
-    : `Your ${subject} coloring page is ready! Download it here: ${imageUrl}`;
-  
+async function sendEmail(imageUrl, subject, locale, toEmail) {
+  const isSpanish = locale === 'es-US';
+
+  const emailSubject = isSpanish
+    ? `¡Tu página para colorear de ${subject} está lista!`
+    : `Your ${subject} coloring page is ready!`;
+
+  const bodyText = isSpanish
+    ? `¡Hola!\n\nTu página para colorear de ${subject} está lista.\n\nDescárgala aquí: ${imageUrl}\n\n¡Feliz coloreado!\nColorBot`
+    : `Hi!\n\nYour ${subject} coloring page is ready.\n\nDownload it here: ${imageUrl}\n\nHappy coloring!\nColorBot`;
+
+  const bodyHtml = isSpanish
+    ? `<html><body><h2>¡Tu página para colorear está lista!</h2><p>Tu página para colorear de <strong>${subject}</strong> está lista.</p><p><a href="${imageUrl}">Haz clic aquí para descargar</a></p><p>¡Feliz coloreado!<br>ColorBot</p></body></html>`
+    : `<html><body><h2>Your coloring page is ready!</h2><p>Your <strong>${subject}</strong> coloring page is ready.</p><p><a href="${imageUrl}">Click here to download</a></p><p>Happy coloring!<br>ColorBot</p></body></html>`;
+
   try {
     const params = {
-      Message: message,
-      PhoneNumber: phoneNumber,
-      MessageAttributes: {
-        'AWS.SNS.SMS.SMSType': {
-          DataType: 'String',
-          StringValue: 'Transactional'
+      Source: toEmail, // Using same email as source (must be verified in SES)
+      Destination: {
+        ToAddresses: [toEmail]
+      },
+      Message: {
+        Subject: {
+          Data: emailSubject,
+          Charset: 'UTF-8'
+        },
+        Body: {
+          Text: {
+            Data: bodyText,
+            Charset: 'UTF-8'
+          },
+          Html: {
+            Data: bodyHtml,
+            Charset: 'UTF-8'
+          }
         }
       }
     };
-    
-    await sns.publish(params).promise();
-    console.log('SMS sent successfully');
-    
+
+    await ses.sendEmail(params).promise();
+    console.log('Email sent successfully');
+
   } catch (error) {
-    console.error('SMS Error:', error);
-    // Don't throw error - SMS failure shouldn't break the main flow
+    console.error('Email Error:', error);
+    // Don't throw error - email failure shouldn't break the main flow
   }
 }
 
