@@ -20,7 +20,12 @@ echo "🔐 Setting up secure parameters..."
 chmod +x setup-parameters.sh
 ./setup-parameters.sh
 
-# Step 2: Create S3 bucket
+# Step 2: Create DynamoDB table for query logging
+echo "📊 Setting up DynamoDB table for query logging..."
+chmod +x setup-dynamodb.sh
+./setup-dynamodb.sh
+
+# Step 3: Create S3 bucket
 echo "📦 Creating S3 bucket: $S3_BUCKET_NAME"
 aws s3 mb s3://$S3_BUCKET_NAME --region us-east-1
 
@@ -81,7 +86,7 @@ if aws lambda get-function --function-name colorbot-alexa-skill --region us-east
     echo "⚙️ Updating Lambda function configuration..."
     aws lambda update-function-configuration \
       --function-name colorbot-alexa-skill \
-      --timeout 30 \
+      --timeout 60 \
       --memory-size 256 \
       --region us-east-1 \
       --output json > /dev/null
@@ -94,7 +99,7 @@ else
       --role arn:aws:iam::$AWS_ACCOUNT_ID:role/ColorBotLambdaRole \
       --handler index.handler \
       --zip-file fileb://colorbot-lambda.zip \
-      --timeout 30 \
+      --timeout 60 \
       --memory-size 256 \
       --region us-east-1 \
       --output json > /dev/null

@@ -24,133 +24,35 @@
           "slots": [
             {
               "name": "subject",
-              "type": "COLORING_SUBJECTS"
+              "type": "AMAZON.SearchQuery"
             }
           ],
           "samples": [
-            "print me a {subject} to color",
-            "print me a {subject}",
-            "I want a {subject} coloring page",
-            "I want a {subject}",
-            "make me a {subject}",
-            "create a {subject} for coloring",
-            "create a {subject}",
-            "give me a {subject}",
-            "draw me a {subject}",
-            "generate a {subject}",
-            "can you make a {subject}",
-            "I need a {subject}",
-            "show me a {subject}"
+            "print me {subject} to color",
+            "print me {subject}",
+            "I want {subject} coloring page",
+            "I want {subject}",
+            "make me {subject}",
+            "create {subject} for coloring",
+            "create {subject}",
+            "give me {subject}",
+            "draw me {subject}",
+            "generate {subject}",
+            "can you make {subject}",
+            "I need {subject}",
+            "show me {subject}",
+            "{subject}",
+            "I want to color {subject}",
+            "coloring page of {subject}",
+            "draw {subject}",
+            "make {subject} coloring page",
+            "I would like {subject}",
+            "please make {subject}",
+            "can I have {subject}"
           ]
         }
       ],
-      "types": [
-        {
-          "name": "COLORING_SUBJECTS",
-          "values": [
-            {
-              "name": {
-                "value": "dinosaur"
-              }
-            },
-            {
-              "name": {
-                "value": "unicorn"
-              }
-            },
-            {
-              "name": {
-                "value": "dragon"
-              }
-            },
-            {
-              "name": {
-                "value": "butterfly"
-              }
-            },
-            {
-              "name": {
-                "value": "cat"
-              }
-            },
-            {
-              "name": {
-                "value": "dog"
-              }
-            },
-            {
-              "name": {
-                "value": "bird"
-              }
-            },
-            {
-              "name": {
-                "value": "flower"
-              }
-            },
-            {
-              "name": {
-                "value": "tree"
-              }
-            },
-            {
-              "name": {
-                "value": "house"
-              }
-            },
-            {
-              "name": {
-                "value": "car"
-              }
-            },
-            {
-              "name": {
-                "value": "airplane"
-              }
-            },
-            {
-              "name": {
-                "value": "boat"
-              }
-            },
-            {
-              "name": {
-                "value": "castle"
-              }
-            },
-            {
-              "name": {
-                "value": "princess"
-              }
-            },
-            {
-              "name": {
-                "value": "prince"
-              }
-            },
-            {
-              "name": {
-                "value": "superhero"
-              }
-            },
-            {
-              "name": {
-                "value": "robot"
-              }
-            },
-            {
-              "name": {
-                "value": "monster"
-              }
-            },
-            {
-              "name": {
-                "value": "alien"
-              }
-            }
-          ]
-        }
-      ]
+      "types": []
     }
   }
 }

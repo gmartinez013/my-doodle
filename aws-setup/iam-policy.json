@@ -5,7 +5,7 @@
       "Effect": "Allow",
       "Action": [
         "logs:CreateLogGroup",
-        "logs:CreateLogStream", 
+        "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
       "Resource": "arn:aws:logs:*:*:*"
@@ -38,6 +38,17 @@
         "arn:aws:ssm:*:*:parameter/colorbot/notification-email",
         "arn:aws:ssm:*:*:parameter/colorbot/s3-bucket-name"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/colorbot-query-logs"
     }
   ]
 }
