@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "colorbot",
+      "invocationName": "color bot",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -41,7 +41,6 @@
             "can you make {subject}",
             "I need {subject}",
             "show me {subject}",
-            "{subject}",
             "I want to color {subject}",
             "coloring page of {subject}",
             "draw {subject}",

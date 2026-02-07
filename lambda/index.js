@@ -51,7 +51,7 @@ let openai = null;
 // Localized responses
 const responses = {
   'en-US': {
-    welcome: "Welcome to ColorBot! Tell me what you'd like to color. You can say anything, like 'a dinosaur riding a skateboard' or 'a magical castle with dragons'.",
+    welcome: "Welcome to Color Bot! Tell me what you'd like to color. You can say anything, like 'a dinosaur riding a skateboard' or 'a magical castle with dragons'.",
     help: "I can create custom coloring pages for you! Just describe what you want - it can be simple like 'a cat' or creative like 'a robot cooking pancakes'. I'll create it and send the link to your email!",
     goodbye: "Happy coloring! See you next time!",
     error: "Sorry, I had trouble creating your coloring page. Please try again.",
@@ -60,7 +60,7 @@ const responses = {
     done: "I've created your coloring page and sent the link to your email. Happy coloring!"
   },
   'es-US': {
-    welcome: "¡Bienvenido a ColorBot! Dime qué te gustaría colorear. Puedes decir cualquier cosa, como 'un dinosaurio en patineta' o 'un castillo mágico con dragones'.",
+    welcome: "¡Bienvenido a Color Bot! Dime qué te gustaría colorear. Puedes decir cualquier cosa, como 'un dinosaurio en patineta' o 'un castillo mágico con dragones'.",
     help: "¡Puedo crear páginas para colorear personalizadas! Solo describe lo que quieres - puede ser simple como 'un gato' o creativo como 'un robot cocinando panqueques'. ¡Lo crearé y enviaré el enlace a tu correo!",
     goodbye: "¡Feliz coloreado! ¡Hasta la próxima!",
     error: "Lo siento, tuve problemas para crear tu página para colorear. Por favor, inténtalo de nuevo.",
@@ -365,12 +365,12 @@ async function sendEmail(imageUrl, subject, locale, toEmail) {
     : `Your coloring page is ready!`;
 
   const bodyText = isSpanish
-    ? `¡Hola!\n\nTu página para colorear de "${displaySubject}" está lista.\n\nDescárgala aquí: ${imageUrl}\n\n¡Feliz coloreado!\nColorBot`
-    : `Hi!\n\nYour "${displaySubject}" coloring page is ready.\n\nDownload it here: ${imageUrl}\n\nHappy coloring!\nColorBot`;
+    ? `¡Hola!\n\nTu página para colorear de "${displaySubject}" está lista.\n\nDescárgala aquí: ${imageUrl}\n\n¡Feliz coloreado!\nColor Bot`
+    : `Hi!\n\nYour "${displaySubject}" coloring page is ready.\n\nDownload it here: ${imageUrl}\n\nHappy coloring!\nColor Bot`;
 
   const bodyHtml = isSpanish
-    ? `<html><body><h2>¡Tu página para colorear está lista!</h2><p>Tu página para colorear de <strong>"${displaySubject}"</strong> está lista.</p><p><a href="${imageUrl}">Haz clic aquí para descargar</a></p><p>¡Feliz coloreado!<br>ColorBot</p></body></html>`
-    : `<html><body><h2>Your coloring page is ready!</h2><p>Your <strong>"${displaySubject}"</strong> coloring page is ready.</p><p><a href="${imageUrl}">Click here to download</a></p><p>Happy coloring!<br>ColorBot</p></body></html>`;
+    ? `<html><body><h2>¡Tu página para colorear está lista!</h2><p>Tu página para colorear de <strong>"${displaySubject}"</strong> está lista.</p><p><a href="${imageUrl}">Haz clic aquí para descargar</a></p><p>¡Feliz coloreado!<br>Color Bot</p></body></html>`
+    : `<html><body><h2>Your coloring page is ready!</h2><p>Your <strong>"${displaySubject}"</strong> coloring page is ready.</p><p><a href="${imageUrl}">Click here to download</a></p><p>Happy coloring!<br>Color Bot</p></body></html>`;
 
   try {
     const params = {
