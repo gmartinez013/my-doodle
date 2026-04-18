@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Color Bot",
+    "slug": "my-doodle",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#FFF9F0"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.mydoodle.colorbot",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Color Bot listens to your idea so it can draw a coloring page just for you!",
+        "NSMicrophoneUsageDescription": "Color Bot needs the microphone so kids can speak their coloring page ideas."
+      }
+    },
+    "android": {
+      "package": "com.mydoodle.colorbot",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-speech-recognition"
+    ]
+  }
+}
